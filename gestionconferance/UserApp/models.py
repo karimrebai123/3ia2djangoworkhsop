@@ -2,10 +2,15 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
+import uuid, re
 # Create your models here.
-import uuid
+
 def generate_user_id():
     return "USER"+uuid.uuid4().hex[:4].upper()
+def validate_user_id(value):
+    if not re.match(r'^USER[A-Z0-9]{4}$', value):
+        raise ValidationError("Le user_id doit suivre le format USERXXXX (8 caractères au total).")
+
 def verify_email(email):
     domaine=["esprit.tn","seasame.com","tek.tn","central.net"]
     email_domaine=email.split("@")[1]
@@ -25,7 +30,7 @@ class User(AbstractUser):
     last_name=models.CharField(max_length=255,validators=[name_validator]
                                )
     ROLE=[
-        ("particpant","participant"),
+        ("participant","participant"),
         ("commitee","organizing commitee member"),
     ]
 
